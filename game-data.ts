@@ -450,29 +450,23 @@ export const WORD_SEARCH_THEMES: WordSearchTheme[] = [
   {
     id: "apostolos",
     title: "Os 12 Apóstolos",
-    words: ["PEDRO", "ANDRE", "TIAGO", "JOAO", "FILIPE", "BARTOLOMEU", "MATEUS", "TOME", "TIAGOALFEU", "TADEU", "SIMAO", "JUDAS"],
+export const WORD_SEARCH_THEMES = [
+  {
+    id: "apostolos",
+    title: "Os 12 Apóstolos",
+    words: ["PEDRO", "ANDRE", "TIAGO", "JOAO", "FILIPE", "BARTOLOMEU", "TOME", "MATEUS", "TADEU", "SIMAO", "JUDAS"]
   },
   {
-    id: "profetas",
-    title: "Profetas de Israel",
-    words: ["ISAIAS", "JEREMIAS", "EZEQUIEL", "DANIEL", "OSEIAS", "JOEL", "AMOS", "JONAS", "MIQUEAS"],
+    id: "livros_at",
+    title: "Livros do Velho Testamento",
+    words: ["GENESIS", "EXODO", "LEVITICO", "NUMEROS", "DEUTERONOMIO", "JOSUE", "JUIZES", "RUTE", "1SAMUEL", "2SAMUEL", "1REIS", "2REIS", "1CRONICAS", "2CRONICAS", "ESDRAS", "NEEMIAS", "ESTER", "JO", "SALMOS", "PROVERBIOS", "ECLESIASTES", "CANTARES", "ISAIAS", "JEREMIAS", "LAMENTACOES", "EZEQUIEL", "DANIEL", "OSEIAS", "JOEL", "AMOS", "OBADIAS", "JONAS", "MIQUEIAS", "NAUM", "HABACUQUE", "SOFONIAS", "AGEU", "ZACARIAS", "MALAQUIAS"]
   },
   {
-    id: "milagres",
-    title: "Milagres de Jesus",
-    words: ["CURA", "RESSURREICAO", "MULTIPLICACAO", "TEMPESTADE", "CEGO", "LEPROSO", "AGUA", "VINHO"],
-  },
-  {
-    id: "lugares",
-    title: "Lugares Sagrados",
-    words: ["JERUSALEM", "BELEM", "NAZARE", "JORDAO", "SINAI", "EDEN", "CALVARIO", "GALILAIA"],
-  },
-  {
-    id: "livros-at",
-    title: "Livros do Antigo Testamento",
-    words: ["GENESIS", "EXODO", "LEVITICO", "NUMEROS", "DEUTERONOMIO", "JOSUE", "JUIZES", "RUTE", "SAMUEL", "REIS", "CRONICAS", "ESDRAS", "NEEMIAS", "ESTER", "JO", "SALMOS", "PROVERBIOS", "ECLESIASTES", "CANTARES", "ISAIAS", "JEREMIAS", "LAMENTACOES", "EZEQUIEL", "DANIEL", "OSEIAS", "JOEL", "AMOS", "OBADIAS", "JONAS", "MIQUEAS", "NAUM", "HABACUQUE", "SOFONIAS", "AGEU", "ZACARIAS", "MALAQUIAS"],
-  },
-  {
+    id: "livros_nt",
+    title: "Livros do Novo Testamento",
+    words: ["MATEUS", "MARCOS", "LUCAS", "JOAO", "ATOS", "ROMANOS", "1CORINTIOS", "2CORINTIOS", "GALATAS", "EFESIOS", "FILIPENSES", "COLOSSENSES", "1TESSALONICENSES", "2TESSALONICENSES", "1TIMOTEO", "2TIMOTEO", "TITO", "FILEMON", "HEBREUS", "TIAGO", "1PEDRO", "2PEDRO", "1JOAO", "2JOAO", "3JOAO", "JUDAS", "APOCALIPSE"]
+  }
+];
     id: "livros-nt",
     title: "Livros do Novo Testamento",
     words: ["MATEUS", "MARCOS", "LUCAS", "JOAO", "ATOS", "ROMANOS", "HEBREUS", "APOCALIPSE"],
