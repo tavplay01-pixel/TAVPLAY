@@ -1,0 +1,12 @@
+{
+  "buildCommand": "echo done",
+  "outputDirectory": "dist",
+  "installCommand": "echo skip",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/:path*",
+      "destination": "/index.html"
+    }
+  ]
+}
