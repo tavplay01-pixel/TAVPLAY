@@ -1,0 +1,419 @@
+import React, { useState, useCallback, useEffect, useRef } from "react";
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  ScrollView,
+  FlatList,
+} from "react-native";
+import { useRouter } from "expo-router";
+import * as Haptics from "expo-haptics";
+import { Platform } from "react-native";
+
+import { ScreenContainer } from "@/components/screen-container";
+import { useColors } from "@/hooks/use-colors";
+import { useGame } from "@/lib/game-context";
+import { useAudioContext } from "@/lib/audio-context";
+import { WORD_SEARCH_THEMES } from "@/lib/game-data";
+
+const GRID_SIZE = 10;
+const TIMER_SECONDS = 300; // 5 minutes
+
+function buildGrid(words: string[]): { grid: string[][]; wordPositions: Map<string, Array<[number, number]>> } {
+  const grid: string[][] = Array.from({ length: GRID_SIZE }, () =>
+    Array(GRID_SIZE).fill("")
+  );
+  const wordPositions = new Map<string, Array<[number, number]>>();
+  const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+  const directions = [
+    [0, 1], [1, 0], [0, -1], [-1, 0],
+    [1, 1], [1, -1], [-1, 1], [-1, -1],
+  ];
+
+  const tryPlace = (word: string): boolean => {
+    const shuffledDirs = [...directions].sort(() => Math.random() - 0.5);
+    for (let attempt = 0; attempt < 50; attempt++) {
+      const dir = shuffledDirs[attempt % shuffledDirs.length];
+      const row = Math.floor(Math.random() * GRID_SIZE);
+      const col = Math.floor(Math.random() * GRID_SIZE);
+      const positions: Array<[number, number]> = [];
+      let fits = true;
+
+      for (let i = 0; i < word.length; i++) {
+        const r = row + dir[0] * i;
+        const c = col + dir[1] * i;
+        if (r < 0 || r >= GRID_SIZE || c < 0 || c >= GRID_SIZE) { fits = false; break; }
+        if (grid[r][c] !== "" && grid[r][c] !== word[i]) { fits = false; break; }
+        positions.push([r, c]);
+      }
+
+      if (fits) {
+        positions.forEach(([r, c], i) => { grid[r][c] = word[i]; });
+        wordPositions.set(word, positions);
+        return true;
+      }
+    }
+    return false;
+  };
+
+  // Place words
+  const sortedWords = [...words].sort((a, b) => b.length - a.length);
+  sortedWords.forEach((w) => tryPlace(w));
+
+  // Fill empty cells
+  for (let r = 0; r < GRID_SIZE; r++) {
+    for (let c = 0; c < GRID_SIZE; c++) {
+      if (!grid[r][c]) {
+        grid[r][c] = ALPHABET[Math.floor(Math.random() * ALPHABET.length)];
+      }
+    }
+  }
+
+  return { grid, wordPositions };
+}
+
+export default function CacaPalavrasScreen() {
+  const colors = useColors();
+  const router = useRouter();
+  const { recordGame } = useGame();
+  const { playCorrectSound } = useAudioContext();
+
+  const [themeIdx, setThemeIdx] = useState(0);
+  const [gameStarted, setGameStarted] = useState(false);
+  const theme = WORD_SEARCH_THEMES[themeIdx];
+
+  const [{ grid, wordPositions }] = useState(() => buildGrid(theme.words));
+  const [foundWords, setFoundWords] = useState<Set<string>>(new Set());
+  const [selectedCells, setSelectedCells] = useState<Array<[number, number]>>([]);
+  const [selecting, setSelecting] = useState(false);
+  const [startCell, setStartCell] = useState<[number, number] | null>(null);
+  const [timeLeft, setTimeLeft] = useState(TIMER_SECONDS);
+  const [score, setScore] = useState(0);
+  const [finished, setFinished] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (!gameStarted || finished) return;
+    timerRef.current = setInterval(() => {
+      setTimeLeft((t) => {
+        if (t <= 1) {
+          clearInterval(timerRef.current!);
+          setFinished(true);
+          recordGame("caca-palavras", score, foundWords.size > 0);
+          return 0;
+        }
+        return t - 1;
+      });
+    }, 1000);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [gameStarted, finished]);
+
+  const formatTime = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+
+  const getLineCells = (from: [number, number], to: [number, number]): Array<[number, number]> => {
+    const dr = to[0] - from[0];
+    const dc = to[1] - from[1];
+    const steps = Math.max(Math.abs(dr), Math.abs(dc));
+    if (steps === 0) return [from];
+    const rDir = dr === 0 ? 0 : dr / Math.abs(dr);
+    const cDir = dc === 0 ? 0 : dc / Math.abs(dc);
+    // Only allow straight lines
+    if (Math.abs(dr) !== 0 && Math.abs(dc) !== 0 && Math.abs(dr) !== Math.abs(dc)) return [from];
+    const cells: Array<[number, number]> = [];
+    for (let i = 0; i <= steps; i++) {
+      cells.push([from[0] + rDir * i, from[1] + cDir * i]);
+    }
+    return cells;
+  };
+
+  const checkSelection = useCallback(
+    (cells: Array<[number, number]>) => {
+      const word = cells.map(([r, c]) => grid[r][c]).join("");
+      const wordRev = word.split("").reverse().join("");
+
+      for (const [w, positions] of wordPositions.entries()) {
+        if (foundWords.has(w)) continue;
+        const posStr = positions.map(([r, c]) => `${r},${c}`).join("|");
+        const selStr = cells.map(([r, c]) => `${r},${c}`).join("|");
+        const selRevStr = [...cells].reverse().map(([r, c]) => `${r},${c}`).join("|");
+
+        if (posStr === selStr || posStr === selRevStr) {
+          const newFound = new Set(foundWords);
+          newFound.add(w);
+          setFoundWords(newFound);
+          const pts = w.length * 5;
+          setScore((s) => s + pts);
+
+          playCorrectSound();
+          if (Platform.OS !== "web") {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          }
+
+          if (newFound.size === theme.words.length) {
+            clearInterval(timerRef.current!);
+            const timeBonus = timeLeft;
+            setScore((s) => s + timeBonus);
+            setFinished(true);
+            recordGame("caca-palavras", score + pts + timeBonus, true);
+          }
+          return;
+        }
+      }
+      if (Platform.OS !== "web") {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      }
+    },
+    [foundWords, wordPositions, grid, theme.words.length, timeLeft, score, recordGame]
+  );
+
+  const isHighlighted = (r: number, c: number) =>
+    selectedCells.some(([sr, sc]) => sr === r && sc === c);
+
+  const isFound = (r: number, c: number) => {
+    for (const [w, positions] of wordPositions.entries()) {
+      if (foundWords.has(w) && positions.some(([pr, pc]) => pr === r && pc === c)) return true;
+    }
+    return false;
+  };
+
+  if (!gameStarted) {
+    return (
+      <ScreenContainer style={{ backgroundColor: colors.background }}>
+        <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+          <Pressable onPress={() => router.back()} style={styles.backBtn}>
+            <Text style={[styles.backText, { color: colors.primary }]}>‹ Voltar</Text>
+          </Pressable>
+          <Text style={[styles.headerTitle, { color: colors.foreground }]}>Caça-Palavras</Text>
+          <View style={{ width: 70 }} />
+        </View>
+        <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
+          <Text style={[styles.selectTitle, { color: colors.foreground }]}>Escolha um tema:</Text>
+          {WORD_SEARCH_THEMES.map((t, i) => (
+            <Pressable
+              key={t.id}
+              onPress={() => { setThemeIdx(i); setGameStarted(true); }}
+              style={({ pressed }) => [
+                styles.themeCard,
+                { backgroundColor: colors.surface, borderColor: colors.border, opacity: pressed ? 0.85 : 1 },
+              ]}
+            >
+              <Text style={[styles.themeTitle, { color: colors.foreground }]}>{t.title}</Text>
+              <Text style={[styles.themeCount, { color: colors.muted }]}>{t.words.length} palavras · Timer: 5 min</Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </ScreenContainer>
+    );
+  }
+
+  if (finished) {
+    return (
+      <ScreenContainer style={{ backgroundColor: colors.background }}>
+        <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+          <Pressable onPress={() => router.back()} style={styles.backBtn}>
+            <Text style={[styles.backText, { color: colors.primary }]}>‹ Voltar</Text>
+          </Pressable>
+          <Text style={[styles.headerTitle, { color: colors.foreground }]}>Caça-Palavras</Text>
+          <View style={{ width: 70 }} />
+        </View>
+        <ScrollView contentContainerStyle={styles.resultContainer}>
+          <Text style={styles.resultEmoji}>{foundWords.size === theme.words.length ? "🔍" : "⏱️"}</Text>
+          <Text style={[styles.resultTitle, { color: colors.foreground }]}>
+            {foundWords.size === theme.words.length ? "Parabéns!" : "Tempo esgotado!"}
+          </Text>
+          <Text style={[styles.resultScore, { color: colors.primary }]}>{score} pontos</Text>
+          <View style={[styles.resultCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Text style={[styles.resultStat, { color: colors.foreground }]}>
+              🔍 Palavras: <Text style={{ color: colors.success }}>{foundWords.size}/{theme.words.length}</Text>
+            </Text>
+          </View>
+          <Pressable onPress={() => router.back()} style={[styles.doneBtn, { backgroundColor: colors.primary }]}>
+            <Text style={styles.doneBtnText}>Voltar ao Início</Text>
+          </Pressable>
+        </ScrollView>
+      </ScreenContainer>
+    );
+  }
+
+  return (
+    <ScreenContainer style={{ backgroundColor: colors.background }}>
+      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        <Pressable onPress={() => { recordGame("caca-palavras", score, foundWords.size > 0); router.back(); }} style={styles.backBtn}>
+          <Text style={[styles.backText, { color: colors.primary }]}>‹ Sair</Text>
+        </Pressable>
+        <Text style={[styles.headerTitle, { color: colors.foreground }]}>{theme.title}</Text>
+        <View style={[styles.timerPill, { backgroundColor: timeLeft <= 60 ? colors.error + "22" : colors.primary + "22" }]}>
+          <Text style={[styles.timerText, { color: timeLeft <= 60 ? colors.error : colors.primary }]}>
+            ⏱ {formatTime(timeLeft)}
+          </Text>
+        </View>
+      </View>
+
+      <ScrollView contentContainerStyle={{ padding: 12, gap: 12 }}>
+        {/* Stats */}
+        <View style={styles.statsRow}>
+          <Text style={[styles.statText, { color: colors.muted }]}>
+            🔍 {foundWords.size}/{theme.words.length} palavras
+          </Text>
+          <Text style={[styles.statText, { color: colors.primary }]}>{score} pts</Text>
+        </View>
+
+        {/* Grid */}
+        <View style={[styles.gridContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          {grid.map((row, r) => (
+            <View key={r} style={styles.gridRow}>
+              {row.map((letter, c) => {
+                const highlighted = isHighlighted(r, c);
+                const found = isFound(r, c);
+                return (
+                  <Pressable
+                    key={c}
+                    onPress={() => {
+                      if (!startCell) {
+                        setStartCell([r, c]);
+                        setSelectedCells([[r, c]]);
+                      } else {
+                        const cells = getLineCells(startCell, [r, c]);
+                        checkSelection(cells);
+                        setStartCell(null);
+                        setSelectedCells([]);
+                      }
+                    }}
+                    style={[
+                      styles.cell,
+                      {
+                        backgroundColor: found
+                          ? colors.success + "44"
+                          : highlighted
+                          ? colors.primary + "44"
+                          : "transparent",
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.cellText,
+                        {
+                          color: found
+                            ? colors.success
+                            : highlighted
+                            ? colors.primary
+                            : colors.foreground,
+                          fontWeight: found || highlighted ? "700" : "400",
+                        },
+                      ]}
+                    >
+                      {letter}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          ))}
+        </View>
+
+        {/* Word list */}
+        <View style={[styles.wordListCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Text style={[styles.wordListTitle, { color: colors.foreground }]}>Palavras para encontrar:</Text>
+          <View style={styles.wordList}>
+            {theme.words.map((w) => (
+              <View
+                key={w}
+                style={[
+                  styles.wordChip,
+                  {
+                    backgroundColor: foundWords.has(w) ? colors.success + "33" : colors.background,
+                    borderColor: foundWords.has(w) ? colors.success : colors.border,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.wordChipText,
+                    {
+                      color: foundWords.has(w) ? colors.success : colors.foreground,
+                      textDecorationLine: foundWords.has(w) ? "line-through" : "none",
+                    },
+                  ]}
+                >
+                  {w}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        <Text style={[styles.instructions, { color: colors.muted }]}>
+          Toque em uma letra para iniciar, depois toque na última letra da palavra.
+        </Text>
+      </ScrollView>
+    </ScreenContainer>
+  );
+}
+
+const styles = StyleSheet.create({
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderBottomWidth: 1.5,
+  },
+  backBtn: { padding: 4 },
+  backText: { fontSize: 16, fontWeight: "600" },
+  headerTitle: { fontSize: 15, fontWeight: "700" },
+  timerPill: { borderRadius: 10, paddingHorizontal: 10, paddingVertical: 4 },
+  timerText: { fontSize: 13, fontWeight: "700" },
+  statsRow: { flexDirection: "row", justifyContent: "space-between" },
+  statText: { fontSize: 13 },
+  gridContainer: {
+    borderRadius: 12,
+    padding: 8,
+    borderWidth: 1.5,
+  },
+  gridRow: { flexDirection: "row" },
+  cell: {
+    flex: 1,
+    aspectRatio: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 4,
+  },
+  cellText: { fontSize: 13 },
+  wordListCard: {
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1.5,
+    gap: 8,
+  },
+  wordListTitle: { fontSize: 14, fontWeight: "700" },
+  wordList: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
+  wordChip: {
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderWidth: 1,
+  },
+  wordChipText: { fontSize: 12, fontWeight: "600" },
+  instructions: { fontSize: 12, textAlign: "center" },
+  selectTitle: { fontSize: 18, fontWeight: "700" },
+  themeCard: {
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1.5,
+    gap: 4,
+  },
+  themeTitle: { fontSize: 16, fontWeight: "700" },
+  themeCount: { fontSize: 13 },
+  resultContainer: { padding: 24, alignItems: "center", gap: 16 },
+  resultEmoji: { fontSize: 64 },
+  resultTitle: { fontSize: 26, fontWeight: "700" },
+  resultScore: { fontSize: 36, fontWeight: "700" },
+  resultCard: { borderRadius: 14, padding: 16, borderWidth: 1.5, width: "100%", gap: 8 },
+  resultStat: { fontSize: 16, lineHeight: 24 },
+  doneBtn: { borderRadius: 12, padding: 16, alignItems: "center", width: "100%" },
+  doneBtnText: { fontSize: 16, fontWeight: "700", color: "#F5E6C8" },
+});
