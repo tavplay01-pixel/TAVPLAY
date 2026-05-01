@@ -90,8 +90,14 @@ export default function Home() {
             {isAuthenticated ? (
               <>
                 <span className="text-sm text-muted-foreground">Bem-vindo, {user?.name}</span>
-                <Button onClick={() => navigate("/dashboard")} variant="default">
-                  Dashboard
+                <Button onClick={() => navigate("/profile")} variant="outline" className="text-accent border-accent hover:bg-accent/10">
+                  Perfil
+                </Button>
+                <Button onClick={() => navigate("/ranking")} variant="outline" className="text-accent border-accent hover:bg-accent/10">
+                  Ranking
+                </Button>
+                <Button onClick={() => navigate("/journeys")} variant="default">
+                  Jogar
                 </Button>
               </>
             ) : (
@@ -237,9 +243,12 @@ export default function Home() {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             30% de toda arrecadação do TAV PLAY é doada para o projeto social com crianças no Camboja. Ao jogar, você está ajudando a transformar vidas.
           </p>
-          <div className="inline-block px-6 py-3 bg-accent/10 border border-accent/30 rounded-lg">
-            <span className="text-accent font-bold">Sua diversão tem propósito</span>
-          </div>
+              <div className="inline-block px-6 py-3 bg-accent/10 border border-accent/30 rounded-lg">
+                <span className="text-accent font-bold">Sua diversão tem propósito</span>
+              </div>
+              <Button onClick={() => navigate("/premium")} variant="outline" className="mt-4 text-accent border-accent hover:bg-accent/10">
+                Saiba mais sobre Premium
+              </Button>
         </div>
       </section>
 

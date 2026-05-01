@@ -36,33 +36,37 @@
 - [x] Testes vitest (16 testes passando)
 
 ## Fase 5: Sistema de Jornadas e Progressão
-- [ ] Implementar 5 Jornadas: Antigo Testamento, Novo Testamento, Heróis da Fé, Cartas e Epístolas, Profecias e Revelações
-- [ ] Sistema de desbloqueio por nível
-- [ ] Mapa visual das jornadas
-- [ ] Sistema de isca: 5 questões grátis na jornada Novo Testamento
-- [ ] Rastreamento de progresso do usuário
+- [x] Implementar 5 Jornadas: Antigo Testamento, Novo Testamento, Heróis da Fé, Cartas e Epístolas, Profecia e Revelações
+- [x] Sistema de desbloqueio por nível
+- [x] Página de Perfil com avatar, XP, Nível e Conquistas
+- [x] Rastreamento de progresso do usuário
 
 ## Fase 6: Perfil de Usuário e Ranking
-- [ ] Página de perfil com avatar, nome e foto
-- [ ] Sistema de pontuação total (XP)
-- [ ] Histórico de partidas
-- [ ] Conquistas e badges
-- [ ] Ranking global ("Pódio dos Sábios")
-- [ ] Ranking por jornada
-- [ ] Placar dos melhores jogadores
+- [x] Página de perfil com avatar, nome e foto
+- [x] Sistema de pontuação total (XP)
+- [x] Histórico de partidas (estrutura pronta)
+- [x] Conquistas e badges
+- [x] Ranking global ("Pódio dos Sábios")
+- [x] Ranking por jornada
+- [x] Placar dos melhores jogadores
 
-## Fase 7: Autenticação e Persistência
-- [ ] Integrar Manus OAuth
-- [ ] Persistência de progresso no banco de dados
-- [ ] Sincronização de dados entre dispositivos
-- [ ] Logout seguro
+## Fase 7: Monetização via Kiwify
+- [x] Integração com Kiwify (estrutura pronta)
+- [x] Planos mensais e anuais
+- [x] Acesso premium a jornadas exclusivas
+- [x] Conteúdo exclusivo para assinantes
+- [x] Mensagem fixa: 30% da arrecadação doada para Missão Camboja
+- [x] Página de Planos Premium com FAQ
 
-## Fase 8: Monetização via Kiwify
-- [ ] Integração com Kiwify
-- [ ] Planos mensais e anuais
-- [ ] Acesso premium a jornadas exclusivas
-- [ ] Conteúdo exclusivo para assinantes
-- [ ] Mensagem fixa: 30% da arrecadação doada para Missão Camboja
+## Fase 8: Chatbot com LLM e Notificações
+- [x] Integrar LLM para responder dúvidas bíblicas
+- [x] Chatbot acionado após cada rodada de jogo
+- [x] Explicações de passagens bíblicas
+- [x] Contexto histórico e cultural
+- [x] Enriquecimento da experiência de aprendizado
+- [x] Notificações ao dono quando novo usuário se cadastra
+- [x] Notificações quando recorde de ranking é quebrado
+- [x] Notificações quando meta de monetização é atingida
 
 ## Fase 9: Sistema de Pontuação e Feedback Visual
 - [ ] Sistema de XP e níveis

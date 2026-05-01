@@ -8,6 +8,9 @@ import Home from "./pages/Home";
 import Journeys from "./pages/Journeys";
 import JourneyDetail from "./pages/JourneyDetail";
 import QuizGame from "./pages/QuizGame";
+import Profile from "./pages/Profile";
+import Ranking from "./pages/Ranking";
+import Premium from "./pages/Premium";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -17,6 +20,9 @@ function Router() {
       <Route path="/journeys" component={Journeys} />
       <Route path="/journey/:journeyId" component={JourneyDetail} />
       <Route path="/quiz/:journeyId/:categoryId" component={QuizGame} />
+      <Route path="/profile" component={Profile} />
+      <Route path="/ranking" component={Ranking} />
+      <Route path="/premium" component={Premium} />
       <Route path="/404" component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
