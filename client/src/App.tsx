@@ -11,6 +11,7 @@ import QuizGame from "./pages/QuizGame";
 import Profile from "./pages/Profile";
 import Ranking from "./pages/Ranking";
 import Premium from "./pages/Premium";
+import TrueFalseGame from "./pages/TrueFalseGame";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -23,6 +24,7 @@ function Router() {
       <Route path="/profile" component={Profile} />
       <Route path="/ranking" component={Ranking} />
       <Route path="/premium" component={Premium} />
+      <Route path="/true-false/:journeyId/:categoryId" component={TrueFalseGame} />
       <Route path="/404" component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

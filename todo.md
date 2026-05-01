@@ -93,3 +93,4 @@
 - [ ] Otimizações de performance
 - [ ] Deploy final
 - [ ] Documentação e instruções de uso
+- [x] Verdadeiro ou Falso (2 opções, 15 segundos) - Totalmente funcional
