@@ -125,7 +125,7 @@ export default function Home() {
 
               <div className="flex flex-col sm:flex-row gap-4 fade-in-up">
                 {isAuthenticated ? (
-                  <Button size="lg" className="text-lg">
+                  <Button size="lg" className="text-lg" onClick={() => navigate("/journeys")}>
                     Começar Jornada
                   </Button>
                 ) : (
@@ -251,7 +251,7 @@ export default function Home() {
             Junte-se a milhares de jogadores explorando o conhecimento bíblico de forma interativa e divertida.
           </p>
           {isAuthenticated ? (
-            <Button size="lg" className="text-lg">
+            <Button size="lg" className="text-lg" onClick={() => navigate("/journeys")}>
               Acessar Jornadas
             </Button>
           ) : (
