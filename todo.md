@@ -94,3 +94,16 @@
 - [ ] Deploy final
 - [ ] Documentação e instruções de uso
 - [x] Verdadeiro ou Falso (2 opções, 15 segundos) - Totalmente funcional
+
+## Correções Solicitadas (Prioridade Alta)
+- [x] Corrigir "TAV JOGA" para "TAV PLAY" com logo oficial
+- [x] Corrigir "pé Camboja" para "Projeto Camboja"
+- [x] Remover frase "Sua lag tem propósito?"
+- [x] Simplificar "Experiência completa com elementos de gamificação" para "Experiência completa com alto padrão"
+- [x] Corrigir "Compita" para "Desafie"
+- [x] Corrigir "Adivinha" para "Desvende"
+- [x] Atualizar footer: "TAV PLAY © 2026 O Selo do Conhecimento Bíblico - Desenvolvido por Dorismar R Lima"
+- [x] Remover "Baseado na Bíblia King James" do footer
+- [x] Mudar fundo claro para paleta de pergaminho/papiro/manuscrito (mais sombrio)
+- [x] Implementar bloqueio de acesso aos jogos para não-assinantes (PremiumGate)
+- [x] Criar componente PremiumGate para proteger jogos

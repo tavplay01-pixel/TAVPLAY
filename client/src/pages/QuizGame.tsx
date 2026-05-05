@@ -4,8 +4,9 @@ import { trpc } from "@/lib/trpc";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, ArrowLeft, CheckCircle, XCircle, Clock } from "lucide-react";
+import PremiumGate from "@/components/PremiumGate";
 
-export default function QuizGame() {
+function QuizGameContent() {
   const [match, params] = useRoute("/quiz/:journeyId/:categoryId");
   const [, setLocation] = useLocation();
 
@@ -273,5 +274,13 @@ export default function QuizGame() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function QuizGame() {
+  return (
+    <PremiumGate>
+      <QuizGameContent />
+    </PremiumGate>
   );
 }

@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { getLoginUrl } from "@/const";
-import { Loader2, Scroll, Sparkles, Trophy, Users, Zap } from "lucide-react";
+import { Loader2, Sparkles, Trophy, Users, Zap } from "lucide-react";
 import { useLocation } from "wouter";
 
 const GAME_ICONS = [
@@ -18,7 +18,7 @@ const GAME_ICONS = [
   {
     name: "Forca Bíblica",
     icon: "/manus-storage/forca_biblica_1e992339.png",
-    description: "Adivinhe palavras sagradas",
+    description: "Desvende palavras sagradas",
   },
   {
     name: "Caça Palavras",
@@ -46,7 +46,7 @@ const FEATURES = [
   {
     icon: Trophy,
     title: "Ranking Global",
-    description: "Compita com jogadores do mundo inteiro no Pódio dos Sábios",
+    description: "Desafie jogadores do mundo inteiro no Pódio dos Sábios",
   },
   {
     icon: Zap,
@@ -83,7 +83,11 @@ export default function Home() {
       <nav className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex items-center justify-between py-4">
           <div className="flex items-center gap-2">
-            <Scroll className="w-8 h-8 text-accent" />
+            <img
+              src="/manus-storage/WhatsAppImage2026-04-28at21.16.33_43963444.jpeg"
+              alt="TAV PLAY Logo"
+              className="w-10 h-10 rounded-lg"
+            />
             <span className="text-2xl font-bold text-accent">TAV PLAY</span>
           </div>
           <div className="flex items-center gap-4">
@@ -213,7 +217,7 @@ export default function Home() {
           <div className="text-center space-y-4">
             <h2 className="text-4xl md:text-5xl font-bold">Por Que TAV PLAY?</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Experiência completa de aprendizado bíblico com elementos de gamificação
+              Experiência completa com alto padrão de qualidade
             </p>
           </div>
 
@@ -239,7 +243,7 @@ export default function Home() {
       {/* Mission Section */}
       <section className="py-20 bg-card/50 border-y border-border">
         <div className="container text-center space-y-6">
-          <h2 className="text-4xl font-bold">Missão Camboja</h2>
+          <h2 className="text-4xl font-bold">Projeto Camboja</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             30% de toda arrecadação do TAV PLAY é doada para o projeto social com crianças no Camboja. Ao jogar, você está ajudando a transformar vidas.
           </p>
@@ -275,7 +279,7 @@ export default function Home() {
       <footer className="border-t border-border py-8 bg-card/50">
         <div className="container text-center text-sm text-muted-foreground">
           <p>TAV PLAY © 2026 - O Selo do Conhecimento Bíblico</p>
-          <p className="mt-2">Baseado na Bíblia King James</p>
+          <p className="mt-2">Desenvolvido por Dorismar R Lima</p>
         </div>
       </footer>
     </div>

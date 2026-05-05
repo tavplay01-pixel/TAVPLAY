@@ -5,8 +5,9 @@ import { useLocation, useRoute } from "wouter";
 import { ArrowLeft, CheckCircle, XCircle, Clock } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import GameChatbot from "@/components/GameChatbot";
+import PremiumGate from "@/components/PremiumGate";
 
-export default function TrueFalseGame() {
+function TrueFalseGameContent() {
   const [, params] = useRoute("/true-false/:journeyId/:categoryId");
   const [, setLocation] = useLocation();
 
@@ -254,5 +255,13 @@ export default function TrueFalseGame() {
         />
       )}
     </div>
+  );
+}
+
+export default function TrueFalseGame() {
+  return (
+    <PremiumGate>
+      <TrueFalseGameContent />
+    </PremiumGate>
   );
 }
