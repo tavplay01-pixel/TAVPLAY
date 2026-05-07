@@ -1,8 +1,9 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Lock, Zap } from "lucide-react";
+import { Lock, Zap, Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
+import { trpc } from "@/lib/trpc";
 
 interface PremiumGateProps {
   children: React.ReactNode;
@@ -12,13 +13,30 @@ export default function PremiumGate({ children }: PremiumGateProps) {
   const { user } = useAuth();
   const [, navigate] = useLocation();
 
-  // Se o usuário é admin/owner, permite acesso. Caso contrário, bloqueia (apenas assinantes terão acesso via Kiwify)
-  const hasAccess = user?.role === "admin";
+  // Verificar assinatura premium via Kiwify
+  const { data: subscription, isLoading } = trpc.kiwify.checkSubscription.useQuery(
+    { email: user?.email || "" },
+    { enabled: !!user?.email }
+  );
+
+  // Se o usuário é admin/owner ou tem assinatura premium, permite acesso
+  const hasAccess = user?.role === "admin" || subscription?.isPremium;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-8 h-8 animate-spin text-accent" />
+          <p className="text-foreground">Verificando acesso...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!hasAccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Card className="max-w-md p-8 border-2 border-accent text-center space-y-6">
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="max-w-md w-full p-8 border-2 border-accent text-center space-y-6">
           <div className="flex justify-center">
             <Lock className="w-16 h-16 text-accent" />
           </div>
