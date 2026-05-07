@@ -1,0 +1,15 @@
+.git
+.gitignore
+README.md
+.env.local
+.env.*.local
+node_modules
+pnpm-lock.yaml
+.DS_Store
+.vscode
+.idea
+dist
+build
+coverage
+.manus-logs
+screenshots
